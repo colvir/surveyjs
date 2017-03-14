@@ -542,19 +542,20 @@ var survey = new Survey.Model({
 });
 survey.showTitle = false;
 
-function setNavigationVisibility(survey) {
+function doOnCurrentPageChanged(survey) {
     document.getElementById('surveyPrev').style.display = !survey.isFirstPage ? "inline" : "none";
     document.getElementById('surveyNext').style.display = !survey.isLastPage ? "inline" : "none";
     document.getElementById('surveyComplete').style.display = survey.isLastPage ? "inline" : "none";
     document.getElementById('surveyProgress').innerText = "Page " + (survey.currentPage.visibleIndex + 1) + " of " + survey.visiblePageCount + ".";
+    if(document.getElementById('surveyPageNo')) document.getElementById('surveyPageNo').value = survey.currentPageNo;
 }
 
 
 $("#surveyElement").Survey({
     model: survey,
-    onCurrentPageChanged: setNavigationVisibility
+    onCurrentPageChanged: doOnCurrentPageChanged
 });
-setNavigationVisibility(survey);
+doOnCurrentPageChanged(survey);
 
 
 
@@ -606,19 +607,20 @@ var survey = new Survey.Model({
 });
 survey.showTitle = false;
 
-function setNavigationVisibility(survey) {
+function doOnCurrentPageChanged(survey) {
     document.getElementById(&#39;surveyPrev&#39;).style.display = !survey.isFirstPage ? &quot;inline&quot; : &quot;none&quot;;
     document.getElementById(&#39;surveyNext&#39;).style.display = !survey.isLastPage ? &quot;inline&quot; : &quot;none&quot;;
     document.getElementById(&#39;surveyComplete&#39;).style.display = survey.isLastPage ? &quot;inline&quot; : &quot;none&quot;;
     document.getElementById(&#39;surveyProgress&#39;).innerText = &quot;Page &quot; + (survey.currentPage.visibleIndex + 1) + &quot; of &quot; + survey.visiblePageCount + &quot;.&quot;;
+    if(document.getElementById(&#39;surveyPageNo&#39;)) document.getElementById(&#39;surveyPageNo&#39;).value = survey.currentPageNo;
 }
 
 
 $(&quot;#surveyElement&quot;).Survey({
     model: survey,
-    onCurrentPageChanged: setNavigationVisibility
+    onCurrentPageChanged: doOnCurrentPageChanged
 });
-setNavigationVisibility(survey);
+doOnCurrentPageChanged(survey);
 
 
 
@@ -631,20 +633,34 @@ setNavigationVisibility(survey);
         
         <div class="col-md-4 exampleoptions">
             <p>
+Get/set the current page No: 
+<select id="surveyPageNo" type="text" value="0" onChange="survey.currentPageNo = this.value;">
+    <option>0</option>
+    <option>1</option>
+    <option>2</option>
+</select>
+from 0 to visible page count - 1.
+<pre><code class="language-javascript">survey.currentPageNo = yourValue;</code></pre>
+</p>
+<p>
 Page Prev Text: <input type="text" value="Previous" onChange="survey.pagePrevText = this.value; survey.render();"/> default is "Previous".
-<pre><code class="language-javascript">survey.pagePrevText = yourValue; survey.render();</code></pre>
+<pre><code class="language-javascript">survey.pagePrevText = yourValue;
+survey.render();</code></pre>
 </p>
 <p>
 Page Next Text: <input type="text" value="Next" onChange="survey.pageNextText = this.value; survey.render();"/> default is "Next".
-<pre><code class="language-javascript">survey.pageNextText = yourValue; survey.render();</code></pre>
+<pre><code class="language-javascript">survey.pageNextText = yourValue;
+survey.render();</code></pre>
 </p>
 <p>
 Complete Text: <input type="text" value="Complete" onChange="survey.completeText = this.value; survey.render();"/> default is "Complete".
-<pre><code class="language-javascript">survey.completeText = yourValue; survey.render();</code></pre>
+<pre><code class="language-javascript">survey.completeText = yourValue;
+survey.render();</code></pre>
 </p>
 <p>
 Show Navigation Buttons: <input type="checkbox" checked="true" onChange="survey.showNavigationButtons = this.checked; survey.render();"/> default is true.
-<pre><code class="language-javascript">survey.showNavigationButtons = yourValue; survey.render();</code></pre>
+<pre><code class="language-javascript">survey.showNavigationButtons = yourValue;
+survey.render();</code></pre>
 </p>
 <p>
         </div>
