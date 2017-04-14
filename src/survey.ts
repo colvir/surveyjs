@@ -80,6 +80,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public onAfterRenderQuestion: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public onAfterRenderPanel: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public jsonErrors: Array<JsonError> = null;
+    private viewPageStack: string[] = [];
 
     constructor(jsonObj: any = null) {
         super();
@@ -334,9 +335,20 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     public prevPage(): boolean {
         if (this.isFirstPage) return false;
-        var vPages = this.visiblePages;
-        var index = vPages.indexOf(this.currentPage);
-        this.currentPage = vPages[index - 1];
+        var vPages = this.visiblePages, copyArr = this.viewPageStack.slice();
+        let pageName = copyArr.pop(), index: number;
+        while(pageName){
+            index = vPages.findIndex((page) => {
+                return page.name == pageName;
+            });
+            if(index != -1) break;
+
+            pageName = copyArr.pop();
+        }
+        if(index != -1){
+            this.currentPage = vPages[index];
+            this.viewPageStack = copyArr;
+        }
     }
     public completeLastPage() : boolean {
         if (this.isEditMode && this.isCurrentPageHasErrors) return false;
@@ -408,8 +420,14 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
             this.sendResult(this.surveyPostId, this.clientId, true);
         }
         var vPages = this.visiblePages;
-        var index = vPages.indexOf(this.currentPage);
-        this.currentPage = vPages[index + 1];
+        let nextIndex = -1,
+            nextPage = this.currentPage.getNextPage();
+
+        if(nextPage) nextIndex = vPages.findIndex((page) => page.name == nextPage);
+        if(nextIndex == -1) nextIndex = vPages.indexOf(this.currentPage) + 1;
+
+        this.viewPageStack.push(this.currentPage.name);
+        this.currentPage = vPages[nextIndex];
     }
     protected setCompleted() {
         this.isCompleted = true;

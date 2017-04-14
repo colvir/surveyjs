@@ -1,5 +1,5 @@
 ﻿import {JsonObject} from "./jsonobject";
-import {Base, IPage, IConditionRunner, ISurvey, IElement, IQuestion, HashTable, SurveyElement, SurveyPageId} from "./base";
+import {Base, IPage, IConditionRunner, ISurvey, IElement, IQuestion, HashTable, SurveyElement, SurveyPageId, INextPageCondition} from "./base";
 import {QuestionBase} from "./questionbase";
 import {ConditionRunner} from "./conditions";
 import {QuestionFactory} from "./questionfactory";
@@ -8,6 +8,8 @@ import {PanelModel, PanelModelBase, QuestionRowModel} from "./panel";
 export class PageModel extends PanelModelBase implements IPage {
     private numValue: number = -1;
     public navigationButtonsVisibility: string = "inherit";
+    private nextPageValue: string = null;
+    public nextPage: INextPageCondition[] | string;
     constructor(public name: string = "") {
         super(name);
     }
@@ -45,7 +47,28 @@ export class PageModel extends PanelModelBase implements IPage {
         }
     }
 
-}
+    public runCondition(values: HashTable<any>) {
+        super.runCondition(values);
+        if(Array.isArray(this.nextPage)){
+            let nextPageValue: string = null;
+            this.nextPage.some((cond) => {
+                let conditionRunner = new ConditionRunner(cond.condition);
+                if(conditionRunner.run(values)){
+                    nextPageValue = cond.name;
+                    return true;
+                }
+                return false;
+            });
+            this.nextPageValue = nextPageValue;
+        }
+    }
 
-JsonObject.metaData.addClass("page", [{ name: "navigationButtonsVisibility", default: "inherit", choices: ["iherit", "show", "hide"] }], 
+    public getNextPage(): string{
+        return this.nextPageValue;
+    }
+
+};
+
+JsonObject.metaData.addClass("page", [{ name: "navigationButtonsVisibility", default: "inherit", choices: ["iherit", "show", "hide"] },
+        { name: "nextPage", onSetValue: function (obj, value){obj.nextPage = value; if(!Array.isArray(value) && value != undefined) obj.nextPageValue = value;}}],
     function () { return new PageModel(); }, "panel");

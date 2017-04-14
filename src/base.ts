@@ -62,6 +62,11 @@ export interface IPage extends IConditionRunner {
     onSurveyLoad();
 }
 
+export interface INextPageCondition {
+    name: string;
+    condition: string;
+}
+
 export class Base {
     public getType(): string {
         throw new Error('This method is abstract');
