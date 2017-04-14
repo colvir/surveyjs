@@ -7,9 +7,9 @@ import {QuestionRowModel, PanelModel} from "../panel";
 import {QuestionBase} from "../questionbase";
 
 export class SurveyPage extends React.Component<any, any> {
-    private page: PageModel;
-    private survey: SurveyModel;
-    private creator: ISurveyCreator;
+    protected page: PageModel;
+    protected survey: SurveyModel;
+    protected creator: ISurveyCreator;
     protected css: any;
     constructor(props: any) {
         super(props);

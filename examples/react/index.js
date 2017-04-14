@@ -1,49 +1,168 @@
 function init() {
-    var json = { title: "Product Feedback Survey Example", showProgressBar: "top", pages: [
-        {questions: [
-            { type: "matrix", name: "Quality", title: "Please indicate if you agree or disagree with the following statements",
-                columns: [{ value: 1, text: "Strongly Disagree" },
-                    { value: 2, text: "Disagree" },
-                    { value: 3, text: "Neutral" },
-                    { value: 4, text: "Agree" },
-                    { value: 5, text: "Strongly Agree" }],
-                rows: [{ value: "affordable", text: "Product is affordable" },
-                    { value: "does what it claims", text: "Product does what it claims" },
-                    { value: "better then others", text: "Product is better than other products on the market" },
-                    { value: "easy to use", text: "Product is easy to use" }]},
-            { type: "rating", name: "satisfaction", title: "How satisfied are you with the Product?",
-                mininumRateDescription: "Not Satisfied", maximumRateDescription: "Completely satisfied" },
-            { type: "rating", name: "recommend friends", visibleIf: "{satisfaction} > 3",
-                title: "How likely are you to recommend the Product to a friend or co-worker?",
-                mininumRateDescription: "Will not recommend", maximumRateDescription: "I will recommend" },
-            { type: "comment", name: "suggestions", title:"What would make you more satisfied with the Product?", }
-        ]},
-        {questions: [
-            { type: "radiogroup", name: "price to competitors",
-                title: "Compared to our competitors, do you feel the Product is",
-                choices: ["Less expensive", "Priced about the same", "More expensive", "Not sure"]},
-            { type: "radiogroup", name: "price", title: "Do you feel our current price is merited by our product?",
-                choices: ["correct|Yes, the price is about right",
-                    "low|No, the price is too low for your product",
-                    "high|No, the price is too high for your product"]},
-            { type: "multipletext", name: "pricelimit", title: "What is the... ",
-                items: [{ name: "mostamount", title: "Most amount you would every pay for a product like ours" },
-                    { name: "leastamount", title: "The least amount you would feel comfortable paying" }]}
-        ]},
-        { questions: [
-            { type: "text", name: "email",
-                title: "Thank you for taking our survey. Your survey is almost complete, please enter your email address in the box below if you wish to participate in our drawing, then press the 'Submit' button."}
-        ]}
-    ]};
+	var json = {
+		clearInvisibleValues: true,
+		pages: [
+			{
+				elements: [
+					{
+						type: "text",
+						name: "q2_1",
+						title: "[q2_1] Регистрация первичного бизнес-требования Клиента. Ссылка на задачу TS.",
+					},
+					{
+						type: "comment",
+						name: "q2_2",
+						title: "[q2_2] Действие: Проработать бизнес-требование с Клиентом. Убедиться, что контекст проблемы выявлен полностью. Сформулировать требование:",
+					}
+				],
+				name: "page2_1",
+				nextPage: [{name: "page5_1", condition: "{q2_1} > ' '"}, {name:"page4_1", condition: "{q2_2} > ' '"}]
+			},
+			{
+				elements: [
+					{
+						type: "radiogroup",
+						choices: [
+							{
+								value: "q3ch1",
+								text: "[q3ch1] 1.1 Отсутствие запрашиваемой функциональности в системе Colvir вообще"
+							},
+							{
+								value: "q3ch2",
+								text: "[q3ch2] 1.2 (1.5) Запрашиваемая функциональность есть в системе, но отсутствует в версии клиента"
+							},
+							{
+								value: "q3ch3",
+								text: "[q3ch3] 1.3 Запрашиваемая или аналогичная функциональность есть в версии клиента"
+							}
+						],
+						isRequired: true,
+						name: "q3",
+						title: "[q3] Вопрос 1: Причины обращения клиента за доработкой?"
+					}
+				],
+				name: "page3",
+			},
+			{
+				elements: [
+					{
+						type: "radiogroup",
+						choices: [
+							{
+								value: "q4_1ch1",
+								text: "[q4_1ch1] Инновационное требование Клиента (отрасли)"
+							},
+							{
+								value: "q4_1ch2",
+								text: "[q4_1ch2] Упущено на этапе gap-анализа"
+							},
+							{
+								value: "q4_1ch3",
+								text: "[q4_1ch3] Реализация не соответствует здравому смыслу"
+							},
+							{
+								value: "q4_1ch4",
+								text: "[q4_1ch4] Ошибка при проектировании модуля"
+							},
+							{
+								value: "q4_1ch5",
+								text: "[q4_1ch5] Поступало ранее, но было принято решение отложить"
+							}
+						],
+						isRequired: true,
+						name: "q4_1",
+						title: "[q4_1] Комментарий: Почему запрашиваемая функциональность отсутствует в системе? (аналитика для улучшения процесса)"
+					},
+					{
+						type: "radiogroup",
+						choices: [
+							{
+								value: "q4_2ch1",
+								text: "[q4_2ch1] Да"
+							},
+							{
+								value: "q4_2ch2",
+								text: "[q4_2ch2] Нет"
+							}
+						],
+						isRequired: true,
+						name: "q4_2",
+						title: "[q4_2] Вопрос: Является ли данное требование специфическим для страны Клиента?"
+					},
+					{
+						type: "radiogroup",
+						choices: [
+							{
+								value: "q4_3ch1",
+								text: "[q4_3ch1] 2.1 Функциональность полезна всем, улучшает потребительские свойства продукта"
+							},
+							{
+								value: "q4_3ch2",
+								text: "[q4_3ch2] 2.2 (2.4) Функциональность не соответствует или противоречит законодательству"
+							},
+							{
+								value: "q4_3ch3",
+								text: "[q4_3ch3] 2.3 (2.5) Функциональность нужна только данному клиенту"
+							},
+							{
+								value: "q4_3ch4",
+								text: "[q4_3ch4] 2.4 (2.7) Функциональность нарушает архитектуру и принципы работы системы"
+							},
+							{
+								value: "q4_3ch5",
+								text: "[q4_3ch5] 2.5 (2.6) Функциональность ухудшает потребительские свойства системы"
+							},
+							{
+								value: "q4_3ch6",
+								text: "[q4_3ch6] 2.6 (2.3) Иная трактовка требования законодательства, непозволяющая использовать имеющееся решение"
+							}
+						],
+						isRequired: true,
+						name: "q4_3",
+						title: "[q4_3] Вопрос 2: Оценить  запрашиваемую функциональность. Описание: Совместная работа аналитика и конструктора "
+					}
+				],
+				name: "page4_1",
+			},
+			{
+				elements: [
+					{
+						type: "comment",
+						name: "q5_1",
+						title: "[q5_1] Действие 1: Подтверждение не соответствия или противоречия законодательству (указать нормативно-правовой акт с ссылкой на пункт)",
+						isRequired: true
+					},
+					{
+						type: "radiogroup",
+						choices: [
+							{
+								value: "q5_2ch1",
+								text: "[q5_2ch1] Да. Получить от Клиента письменное подтверждение о принятии на себя ответственности"
+							},
+							{
+								value: "q5_2ch2",
+								text: "[q5_2ch2] Нет. Снять требование"
+							}
+						],
+						isRequired: true,
+						name: "q5_2",
+						title: "[q5_2] Действие 2: Обсудить с Клиентом, озвучить риски. Клиент настаивает на реализации?"
+					}
+				],
+				name: "page5_1",
+				nextPage: "page2_1"
 
-    Survey.Survey.cssType = "bootstrap";
+			}
+		]
+	};
 
-    var model = new Survey.Model(json);
+	Survey.Survey.cssType = "bootstrap";
 
-    ReactDOM.render(<Survey.Survey model={model} />, document.getElementById("surveyElement"));
+	var model = new Survey.Model(json);
 
+	ReactDOM.render(<Survey.Survey model={model} showPrevPages={true} />, document.getElementById("surveyElement"));
 }
 
 if(!window["%hammerhead%"]) {
-    init();
+	init();
 }

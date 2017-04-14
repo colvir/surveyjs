@@ -80,7 +80,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public onAfterRenderQuestion: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public onAfterRenderPanel: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public jsonErrors: Array<JsonError> = null;
-    private viewPageStack: string[] = [];
+    private viewPageIdStack: string[] = [];
 
     constructor(jsonObj: any = null) {
         super();
@@ -113,6 +113,10 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         }
         this.onCreating();
     }
+    public getViewPageIdStack(): string[]{
+        return this.viewPageIdStack;
+    }
+
     public getType(): string { return "survey"; }
     public get locale(): string { return this.localeValue; }
     public set locale(value: string) {
@@ -335,19 +339,19 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     public prevPage(): boolean {
         if (this.isFirstPage) return false;
-        var vPages = this.visiblePages, copyArr = this.viewPageStack.slice();
-        let pageName = copyArr.pop(), index: number;
-        while(pageName){
+        var vPages = this.visiblePages, copyArr = this.viewPageIdStack.slice();
+        let pageId = copyArr.pop(), index: number;
+        while(pageId){
             index = vPages.findIndex((page) => {
-                return page.name == pageName;
+                return page.id == pageId;
             });
             if(index != -1) break;
 
-            pageName = copyArr.pop();
+            pageId = copyArr.pop();
         }
         if(index != -1){
             this.currentPage = vPages[index];
-            this.viewPageStack = copyArr;
+            this.viewPageIdStack = copyArr;
         }
     }
     public completeLastPage() : boolean {
@@ -426,7 +430,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         if(nextPage) nextIndex = vPages.findIndex((page) => page.name == nextPage);
         if(nextIndex == -1) nextIndex = vPages.indexOf(this.currentPage) + 1;
 
-        this.viewPageStack.push(this.currentPage.name);
+        this.viewPageIdStack.push(this.currentPage.id);
         this.currentPage = vPages[nextIndex];
     }
     protected setCompleted() {

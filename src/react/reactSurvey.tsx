@@ -8,6 +8,7 @@ import {ReactQuestionFactory} from "./reactquestionfactory";
 import {surveyCss} from "../defaultCss/cssstandard";
 import {SurveyProgress} from "./reactSurveyProgress";
 import {SurveyPageId} from "../base";
+import {SurveyPreviewPage} from "./reactSurveyPreviewPage";
 
 export class Survey extends React.Component<any, any> implements ISurveyCreator {
     public static get cssType(): string { return surveyCss.currentType; }
@@ -65,6 +66,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
             <div ref="root" className={this.css.root}>
                 {title}
                 <div id={SurveyPageId} className={this.css.body}>
+                    {this.props.showPrevPages && this.survey.getViewPageIdStack().length > 0 && this.renderPreviewPages()}
                     {topProgress}
                     {currentPage}
                     {bottomProgress}
@@ -87,6 +89,16 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
     }
     protected renderEmptySurvey(): JSX.Element {
         return (<span>{this.survey.emptySurveyText}</span>);
+    }
+
+    protected renderPreviewPages(): JSX.Element {
+        return (<div className="preview-pages">
+            {this.survey.getViewPageIdStack().map((pageId, index) => {
+                return <SurveyPreviewPage key={index} survey={this.survey} page={this.survey.pages.find((page) => {
+                    return page.id == pageId;
+                })} css={this.css} creator={this} />
+            })}
+        </div> );
     }
 
     protected updateSurvey(newProps: any) {
