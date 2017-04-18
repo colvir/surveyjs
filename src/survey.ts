@@ -82,6 +82,14 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public jsonErrors: Array<JsonError> = null;
     private viewPageIdStack: string[] = [];
 
+    public addInViewPageStack(pageId: string): boolean{
+        let page = this.pages.find((page) => page.id == pageId);
+        if(page) {
+            this.viewPageIdStack.push(pageId);
+            return true;
+        } else return false;
+    }
+
     constructor(jsonObj: any = null) {
         super();
         this.locTitleValue = new LocalizableString(this);
