@@ -25,8 +25,9 @@ export class QuestionSelectBase extends Question {
         super(name);
         this.choicesValues = ItemValue.createArray(this);
         this.choicesByUrl = this.createRestfull();
-        this.locOtherTextValue = new LocalizableString(this);
-        this.locOtherErrorTextValue = new LocalizableString(this);
+        this.locOtherTextValue = new LocalizableString(this, true);
+        this.locOtherErrorTextValue = new LocalizableString(this, true);
+        this.otherItemValue.locOwner = this;
         var self = this;
         this.choicesByUrl.getResultCallback = function (items: Array<ItemValue>) { self.onLoadChoicesFromUrl(items) };
     }
@@ -112,7 +113,7 @@ export class QuestionSelectBase extends Question {
     public get otherText(): string { return this.locOtherText.text; }
     public set otherText(value: string) { 
         this.locOtherText.text = value; 
-        this.updateOtherItem();
+        this.onVisibleChoicesChanged();
     }
     public get otherErrorText(): string { return this.locOtherErrorText.text; }
     public set otherErrorText(value: string) { this.locOtherErrorText.text = value;  }
@@ -143,11 +144,8 @@ export class QuestionSelectBase extends Question {
     }
     public onLocaleChanged() {
         super.onLocaleChanged();
-        this.updateOtherItem();
-    }
-    private updateOtherItem() {
-        var item = this.otherItem; // set the correct text
-        this.fireCallback(this.choicesChangedCallback);
+        this.onVisibleChoicesChanged();
+        ItemValue.NotifyArrayOnLocaleChanged(this.visibleChoices);
     }
     protected getStoreOthersAsComment() { return this.storeOthersAsComment && (this.survey != null ? this.survey.storeOthersAsComment : true); }
     onSurveyLoad() {

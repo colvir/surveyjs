@@ -157,8 +157,8 @@ function init() {
 	};
 
 	Survey.Survey.cssType = "bootstrap";
-
-	var model = new Survey.Model(json);
+    var model = new Survey.Model(json);
+    window.survey = model;
 
 	ReactDOM.render(<Survey.Survey model={model} showPrevPages={true} />, document.getElementById("surveyElement"));
 }

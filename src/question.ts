@@ -1,6 +1,6 @@
 ﻿import {JsonObject} from './jsonobject';
 import {QuestionBase} from './questionbase';
-import {SurveyError, SurveyElement} from "./base";
+import {Base, SurveyError, SurveyElement} from "./base";
 import {surveyLocalization} from "./surveyStrings";
 import {AnswerRequiredError} from "./error";
 import {SurveyValidator, IValidatorOwner, ValidatorRunner} from "./validator";
@@ -26,8 +26,10 @@ export class Question extends QuestionBase implements IValidatorOwner {
 
     constructor(public name: string) {
         super(name);
-        this.locTitleValue = new LocalizableString(this);
-        this.locCommentTextValue = new LocalizableString(this);
+        this.locTitleValue = new LocalizableString(this, true);
+        var self = this;
+        this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.fullTitle; };
+        this.locCommentTextValue = new LocalizableString(this, true);
     }
     public get hasTitle(): boolean { return true; }
     public get hasInput(): boolean { return true; }
@@ -41,17 +43,26 @@ export class Question extends QuestionBase implements IValidatorOwner {
         this.fireCallback(this.titleChangedCallback);
     }
     public get locTitle(): LocalizableString { return this.locTitleValue; } 
-    public get locCommentText(): LocalizableString { return this.locCommentTextValue; } 
-    public get processedTitle() { return this.survey != null ? this.survey.processText(this.title) : this.title; }
+    public get locCommentText(): LocalizableString { return this.locCommentTextValue; }
+    private get locTitleHtml(): string {
+        var res = this.locTitle.textOrHtml;
+        return res? res: this.name;
+    }
+    public onLocaleChanged() {
+        super.onLocaleChanged();
+        this.locTitle.onChanged();
+        this.locCommentText.onChanged();
+    }
+    public get processedTitle() { return this.survey != null ? this.survey.processText(this.locTitleHtml) : this.locTitleHtml; }
     public get fullTitle(): string {
-        if (this.survey && this.survey.questionTitleTemplate) {
+        if (this.survey && this.survey.getQuestionTitleTemplate()) {
             if (!this.textPreProcessor) {
                 var self = this;
                 this.textPreProcessor = new TextPreProcessor();
                 this.textPreProcessor.onHasValue = function (name: string) { return self.canProcessedTextValues(name.toLowerCase()); };
                 this.textPreProcessor.onProcess = function (name: string) { return self.getProcessedTextValue(name); };
             }
-            return this.textPreProcessor.process(this.survey.questionTitleTemplate);
+            return this.textPreProcessor.process(this.survey.getQuestionTitleTemplate());
         }
         var requireText = this.requiredText;
         if (requireText) requireText += " ";
@@ -158,7 +169,7 @@ export class Question extends QuestionBase implements IValidatorOwner {
     protected setComment(newValue: string) {
         this.setNewComment(newValue);
     }
-    public isEmpty(): boolean { return this.value == null; }
+    public isEmpty(): boolean { return Base.isValueEmpty(this.value); }
     public hasErrors(fireCallback: boolean = true): boolean {
         this.checkForErrors(fireCallback);
         return this.errors.length > 0;

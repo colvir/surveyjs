@@ -4,7 +4,7 @@
             <thead>
                 <tr>
                     <!-- ko foreach: question.columns -->
-                    <th data-bind="text: question.getColumnTitle($data), style: { minWidth: question.getColumnWidth($data) }"></th>
+                    <th data-bind="style: { minWidth: question.getColumnWidth($data) }"><!-- ko template: { name: 'survey-string', data: locTitle } --><!-- /ko --></th>
                     <!-- /ko -->
                     <!-- ko ifnot: question.koIsReadOnly -->
                     <th></th>
@@ -23,14 +23,14 @@
                     </td>
                     <!-- /ko -->
                     <!-- ko ifnot: question.koIsReadOnly -->
-                    <td><input type="button" data-bind="click:question.koRemoveRowClick, css: question.survey.css.matrixdynamic.button, value: question.removeRowText" /></td>
+                    <td><input type="button" data-bind="visible: question.koCanRemoveRow, click:question.koRemoveRowClick, css: question.survey.css.matrixdynamic.button, value: question.removeRowText" /></td>
                     <!-- /ko -->
                 </tr>
                 <!-- /ko -->
             </tbody>
         </table>
     </div>
-    <!-- ko ifnot: question.koIsReadOnly -->
+    <!-- ko ifnot: question.koIsReadOnly() || !question.koCanAddRow() -->
     <input type="button" data-bind="click:question.koAddRowClick, css: question.survey.css.matrixdynamic.button, value: question.addRowText" />
     <!-- /ko -->
 </script>

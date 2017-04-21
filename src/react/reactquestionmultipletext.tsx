@@ -28,7 +28,8 @@ export class SurveyQuestionMultipleText extends SurveyQuestionElementBase {
         var tds = [];
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            tds.push(<td key={"label" + i}><span className={this.css.itemTitle}>{item.fullTitle}</span></td>);
+            var itemTitle = this.renderLocString(item.locTitle);
+            tds.push(<td key={"label" + i}><span className={this.css.itemTitle}>{itemTitle}</span></td>);
             tds.push(<td key={"value" + i}>{this.renderItem(item, i == 0)}</td>);
         }
         return <tr key={key}>{tds}</tr>;
@@ -65,7 +66,7 @@ export class SurveyQuestionMultipleTextItem extends SurveyElementBase {
         if (!this.item) return null;
         var style = { float: "left" };
         if (this.isDisplayMode) return (<div id={this.inputId} className={this.css.itemValue} style={style}>{this.item.value}</div>);
-        return (<input id={this.inputId} className={this.css.itemValue} style={style} type="text" value={this.state.value} placeholder={this.item.placeHolder} onBlur={this.handleOnBlur} onChange={this.handleOnChange} />);
+        return (<input id={this.inputId} className={this.css.itemValue}  type={this.item.inputType} style={style} value={this.state.value} placeholder={this.item.placeHolder} onBlur={this.handleOnBlur} onChange={this.handleOnChange} />);
     }
     protected get mainClassName(): string { return ""; }
 }

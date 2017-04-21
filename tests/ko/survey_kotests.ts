@@ -12,6 +12,8 @@ import {CustomWidgetCollection, QuestionCustomWidget} from "../../src/questionCu
 import {koTemplate} from "../../src/knockout/templateText";
 import {QuestionMatrixDynamic} from "../../src/knockout/koquestion_matrixdynamic";
 import {surveyLocalization} from "../../src/surveyStrings";
+import {QuestionRating} from "../../src/knockout/koquestion_rating";
+import {QuestionRatingModel} from "../../src/question_rating";
 
 export default QUnit.module("koTests");
 
@@ -223,7 +225,7 @@ QUnit.test("koComment property", function (assert) {
 });
 QUnit.test("Load title correctly from JSON", function (assert) {
     var survey = new Survey({ questions: [{ type: "text", name: "question1" }] });
-    assert.equal(survey.pages[0].questions[0]["koTitle"](), "1. question1", "title is getting from name");
+    assert.equal(survey.pages[0].questions[0]["locTitle"]["koRenderedHtml"](), "1. question1", "title is getting from name");
 });
 QUnit.test("koErrors should be empty after prevPage bug#151", function (assert) {
     var survey = new Survey();
@@ -253,6 +255,19 @@ QUnit.test("add customwidget item", function (assert) {
     CustomWidgetCollection.Instance.clear();
 });
 
+QUnit.test("Localization, choices.locText.koRenderedHtml, #349", function (assert) {
+    var survey = new Survey();
+    var page = survey.addNewPage("page");
+    var q1 = <QuestionCheckbox>page.addNewQuestion("checkbox", "q1");
+    q1.choices = [{value: 1, text: {default: "text1", de: "text_de"}}];
+    assert.equal(q1["koVisibleChoices"]()[0].text, "text1", "default locale, text property is 'text1'");
+    assert.equal(q1["koVisibleChoices"]()[0].locText.koRenderedHtml(), "text1", "default locale, locText.koRenderedHtml() is 'text1'");
+    survey.locale = "de";
+    assert.equal(q1["koVisibleChoices"]()[0].text, "text_de", "default locale, text property is 'text_de'");
+    assert.equal(q1["koVisibleChoices"]()[0].locText.koRenderedHtml(), "text_de", "default locale, locText.koRenderedHtml() is 'text_de'");
+    survey.locale = "";
+});
+
 QUnit.test("Localization, otherItem", function (assert) {
     var survey = new Survey();
     var page = survey.addNewPage("page");
@@ -263,6 +278,24 @@ QUnit.test("Localization, otherItem", function (assert) {
     assert.equal(q1["koVisibleChoices"]()[2].text, surveyLocalization.getString("otherItemText"), "use default locale");
     survey.locale = "de";
     assert.notEqual(q1["koVisibleChoices"]()[2].text, defaultText, "use another locale locale");
+    survey.locale = "";
+});
+
+QUnit.test("Rating items creates correct object", function (assert) {
+    assert.ok(QuestionRatingModel.defaultRateValues[0].locText["koRenderedHtml"], "ItemValue for knockout should be created");
+});
+
+QUnit.test("Update page.title correctly with numbers", function (assert) {
+    var survey = new Survey();
+    survey.addPage(createPageWithQuestion("page1"));
+    survey.addPage(createPageWithQuestion("page2"));
+    survey.pages[0].title = "title 1";
+    survey.pages[1].title = "title 2";
+    survey.showPageNumbers = true;
+    survey.currentPageNo = 1;
+    assert.equal(survey.currentPage.locTitle["koRenderedHtml"](), "2. title 2", "It shows page as second");
+    survey.pages[0].visible = false;
+    assert.equal(survey.currentPage.locTitle["koRenderedHtml"](), "1. title 2", "It shows page as first");
 });
 
 

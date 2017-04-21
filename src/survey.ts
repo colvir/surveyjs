@@ -72,6 +72,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public onValidateQuestion: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public onServerValidateQuestions: (sender: SurveyModel, options: any) => any;
     public onProcessHtml: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
+    public onTextMarkdown: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public onSendResult: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public onGetResult: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public onUploadFile: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
@@ -92,14 +93,15 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
 
     constructor(jsonObj: any = null) {
         super();
-        this.locTitleValue = new LocalizableString(this);
+        var self = this;
+        this.locTitleValue = new LocalizableString(this, true);
+        this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.processedTitle; };
         this.locCompletedHtmlValue = new LocalizableString(this);
         this.locPagePrevTextValue = new LocalizableString(this);
         this.locPageNextTextValue = new LocalizableString(this);
         this.locCompleteTextValue = new LocalizableString(this);
-        this.locQuestionTitleTemplateValue = new LocalizableString(this);
+        this.locQuestionTitleTemplateValue = new LocalizableString(this, true);
         
-        var self = this;
         this.textPreProcessor = new TextPreProcessor();
         this.textPreProcessor.onHasValue = function (name: string) { return self.hasProcessedTextValue(name); };
         this.textPreProcessor.onProcess = function (name: string) { return self.getProcessedTextValue(name); };
@@ -136,6 +138,11 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     //ILocalizableOwner
     public getLocale() { return this.locale; }
+    public getMarkdownHtml(text: string)  { 
+        var options = {text: text, html: null}
+        this.onTextMarkdown.fire(this, options);
+        return options.html; 
+    }
     public getLocString(str: string) { return surveyLocalization.getString(str); }
 
     public get emptySurveyText(): string { return this.getLocString("emptySurvey"); }
@@ -156,6 +163,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public get locCompleteText(): LocalizableString { return this.locCompleteTextValue;}
     public get questionTitleTemplate(): string { return this.locQuestionTitleTemplate.text;}
     public set questionTitleTemplate(value: string) { this.locQuestionTitleTemplate.text = value;}
+    public getQuestionTitleTemplate(): string { return this.locQuestionTitleTemplate.textOrHtml; }
     public get locQuestionTitleTemplate(): LocalizableString { return this.locQuestionTitleTemplateValue; }
 
     public get showPageNumbers(): boolean { return this.showPageNumbersValue; }
@@ -170,7 +178,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         this.showQuestionNumbersValue = value;
         this.updateVisibleIndexes();
     };
-    public get processedTitle() { return this.processText(this.title); }
+    public get processedTitle() { return this.processText(this.locTitle.textOrHtml); }
     public get questionTitleLocation(): string { return this.questionTitleLocationValue; };
     public set questionTitleLocation(value: string) {
         if (value === this.questionTitleLocationValue) return;
@@ -401,7 +409,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
             var question = this.currentPage.questions[i];
             if (!question.visible) continue;
             var value = this.getValue(question.name);
-            if (value) options.data[question.name] = value;
+            if (!Base.isValueEmpty(value)) options.data[question.name] = value;
         }
         this.setIsValidatingOnServer(true);
         this.onServerValidateQuestions(this, options);
@@ -823,7 +831,8 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         if (question && (!question.visible || !question.supportGoNextPageAutomatic())) return;
         var questions = this.getCurrentPageQuestions();
         for (var i = 0; i < questions.length; i++) {
-            if (questions[i].hasInput && !this.getValue(questions[i].name)) return;
+            var value = this.getValue(questions[i].name)
+            if (questions[i].hasInput && Base.isValueEmpty(value)) return;
         }
         if (!this.currentPage.hasErrors(true, false)) {
             if (!this.isLastPage) {

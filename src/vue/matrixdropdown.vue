@@ -4,15 +4,15 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th v-for="column in question.columns" :style="{ minWidth: question.getColumnWidth(column) }">{{question.getColumnTitle(column)}}</th>
+                    <th v-for="column in question.columns" :style="{ minWidth: question.getColumnWidth(column) }"><survey-string :locString="column.locTitle"/></th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="row in question.visibleRows">
-                    <td>{{row.text}}</td>
+                    <td><survey-string :locString="row.locText"/></td>
                     <td v-for="cell in row.cells">
                         <survey-errors :question="question" :css="css"/>
-                        <component :is="'survey-' + cell.question.getType()" :question="cell.question" :isEditMode="isEditMode" :css="css"/>
+                        <component :is="'survey-' + cell.question.getType()" :question="cell.question" :css="css"/>
                     </td>
                 </tr>
             </tbody>

@@ -92,7 +92,7 @@ QUnit.test("Pre-proccess value for Checkbox", function (assert) {
     page.addQuestion(question);
 
     survey.setValue("checkboxQuestion", "One");
-    assert.equal(question.value, ["One"], "convert value to array");
+    assert.deepEqual(question.value, ["One"], "convert value to array");
 });
 QUnit.test("Matrix Question: visible rows", function (assert) {
     var matrix = new QuestionMatrixModel("q1");
@@ -474,6 +474,19 @@ QUnit.test("Matrixdynamic adjust rowCount on setting the value", function (asser
     question.value = [{ 'column1': 2 }];
     assert.equal(question.rowCount, 4, "Keep row count equals 4");
 });
+QUnit.test("Matrixdynamic minRowCount/maxRowCount", function (assert) {
+    var question = new QuestionMatrixDynamicModel("matrixDymanic");
+    question.minRowCount = 3;
+    question.maxRowCount = 5;
+    assert.equal(question.rowCount, 3, "row count is min row count");
+    question.rowCount = 5;
+    assert.equal(question.rowCount, 5, "row count is 5");
+    question.maxRowCount = 4;
+    assert.equal(question.rowCount, 4, "row count is max row count");
+    question.addRow();
+    assert.equal(question.rowCount, 4, "row count is still max row count");
+});
+
 QUnit.test("Matrixdropdown different cell types", function (assert) {
     var question = new QuestionMatrixDropdownModel("matrixDropdown");
 

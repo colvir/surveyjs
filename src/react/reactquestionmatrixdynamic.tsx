@@ -36,7 +36,8 @@ export class SurveyQuestionMatrixDynamic extends SurveyQuestionElementBase {
             var key = "column" + i;
             var minWidth = this.question.getColumnWidth(column);
             var columnStyle = minWidth ? { minWidth: minWidth } : {};
-            headers.push(<th key={key} style={columnStyle}>{this.question.getColumnTitle(column) }</th>);
+            var columnTitle = this.renderLocString(column.locTitle);
+            headers.push(<th key={key} style={columnStyle}>{columnTitle}</th>);
         }
         var rows = [];
         var visibleRows = this.question.visibleRows;
@@ -66,7 +67,7 @@ export class SurveyQuestionMatrixDynamic extends SurveyQuestionElementBase {
         );
     }
     protected renderAddRowButton(): JSX.Element {
-        if (this.isDisplayMode) return null;
+        if (this.isDisplayMode || !this.question.canAddRow) return null;
         return <input className={this.css.button} type="button" onClick={this.handleOnRowAddClick} value={this.question.addRowText} />;
     }
 }
@@ -103,7 +104,7 @@ export class SurveyQuestionMatrixDynamicRow extends SurveyElementBase {
             var select = this.renderQuestion(cell);
             tds.push(<td key={"row" + i}>{errors}{select}</td>);
         }
-        if (!this.isDisplayMode) {
+        if (!this.isDisplayMode && this.question.canRemoveRow) {
             var removeButton = this.renderButton();
             tds.push(<td key={"row" + this.row.cells.length + 1}>{removeButton}</td>);
         }

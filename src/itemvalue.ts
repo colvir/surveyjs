@@ -49,11 +49,18 @@ export class ItemValue {
         }
         return null;
     }
+    public static NotifyArrayOnLocaleChanged(items: Array<ItemValue>) {
+        for(var i = 0; i < items.length; i ++) {
+            items[i].locText.onChanged();
+        }
+    }
     private static itemValueProp = [ "text", "value", "hasText", "locOwner", "locText"];
     private itemValue: any;
     private locTextValue: LocalizableString;
     constructor(value: any, text: string = null) {
-        this.locTextValue = new LocalizableString(null);
+        this.locTextValue = new LocalizableString(null, true);
+        var self = this;
+        this.locTextValue.onRenderedHtmlCallback = function(text) { return text ? text : (self.value ? self.value.toString() : null); }
         if(text) this.locText.text = text;
         this.value = value;
     }

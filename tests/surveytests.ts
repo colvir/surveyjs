@@ -12,6 +12,7 @@ import {QuestionTextModel} from "../src/question_text";
 import {QuestionMultipleTextModel, MultipleTextItemModel} from "../src/question_multipletext";
 import {QuestionMatrixModel} from "../src/question_matrix";
 import {ISurvey} from "../src/base";
+import {ItemValue} from "../src/itemvalue";
 import {QuestionDropdownModel} from "../src/question_dropdown";
 import {QuestionCheckboxModel} from "../src/question_checkbox";
 import {QuestionRadiogroupModel} from "../src/question_radiogroup";
@@ -22,6 +23,7 @@ import {QuestionMatrixDynamicModel} from "../src/question_matrixdynamic";
 import {QuestionRatingModel} from "../src/question_rating";
 import {CustomWidgetCollection, QuestionCustomWidget} from "../src/questionCustomWidgets";
 import {QuestionSelectBase} from "../src/question_baseselect";
+import {LocalizableString} from "../src/localizablestring";
 
 export default QUnit.module("Survey");
 
@@ -104,6 +106,21 @@ QUnit.test("Do not show required error for readOnly questions", function (assert
     assert.equal(page.hasErrors(), true, "There is a required error");
     q1.readOnly = true;
     assert.equal(page.hasErrors(), false, "There is no errors, the question is readOnly");
+});
+QUnit.test("Do not show required error for value 0 and false, #345", function (assert) {
+    var survey = twoPageSimplestSurvey();
+    var page = survey.pages[0];
+    var q1 = <Question>(<Question>page.questions[0]);
+    q1.isRequired = true;
+    assert.equal(page.hasErrors(), true, "There is a required error");
+    survey.setValue("question1", 0)
+    assert.equal(q1.value, 0, "question1.value == 0");
+    assert.equal(page.hasErrors(), false, "There is no errors, the question value is 0");
+    survey.setValue("question1", false)
+    assert.equal(q1.value, false, "question1.value == false");
+    assert.equal(page.hasErrors(), false, "There is no errors, the question value is false");
+    survey.setValue("question1", null)
+    assert.equal(page.hasErrors(), true, "There is a required error, the question value is null");
 });
 QUnit.test("Next, Prev, IsFirst and IsLast Page and progressText", function (assert) {
     var survey = new SurveyModel();
@@ -1042,6 +1059,18 @@ QUnit.test("multiple triger on checkbox stop working.", function (assert) {
     assert.equal(survey.getQuestionByName("question3").visible, true, "The third question is visible");
 });
 
+QUnit.test("QuestionCheckbox if single value set then convert it to array, #334", function (assert) {
+    var survey = new SurveyModel();
+    var page = survey.addNewPage("page1");
+    var q1 = <QuestionCheckboxModel>page.addNewQuestion("checkbox", "q1");
+    survey.setValue("q1", [1]);
+    assert.deepEqual(survey.getValue("q1"), [1], "survey.getValue returns array");
+    assert.deepEqual(q1.value, [1], "q1.value returns array");
+    survey.setValue("q1", 1);
+    assert.deepEqual(survey.getValue("q1"), 1, "survey.getValue return value");
+    assert.deepEqual(q1.value, [1], "q1.value still returns array");
+});
+
 QUnit.test("visibleIf and page rows", function (assert) {
     var survey = new SurveyModel({
         pages:[
@@ -1193,6 +1222,110 @@ QUnit.test("Survey Localication - multipletext.items", function (assert) {
     survey.locale = "fr";
     assert.equal(item.title, "title1", "Use default text, title");
     assert.equal(item.placeHolder, "caption1", "Use default text, placeHolder");
+});
+
+QUnit.test("Survey Markdown - dropdown.choices", function (assert) {
+    var survey = new SurveyModel();
+    var page = survey.addNewPage("Page 1");
+    var q1 = new QuestionDropdownModel("q1");
+    page.addQuestion(q1);
+    q1.choices = [{value: 1, text: "text1"}, {value: 1, text: "text2markdown"}];
+    survey.onTextMarkdown.add(function(survey, options) { 
+        if(options.text.indexOf("markdown")> -1) options.html = options.text.replace("markdown", "!") 
+    });
+    var loc1 = (<ItemValue>q1.choices[0]).locText;
+    var loc2 = (<ItemValue>q1.choices[1]).locText;
+    assert.equal(loc1.renderedHtml, "text1", "render standard text");
+    assert.equal(loc2.renderedHtml, "text2!", "render markdown text");
+});
+
+QUnit.test("Survey Markdown - question title", function (assert) {
+    var survey = new SurveyModel();
+    var page = survey.addNewPage("Page 1");
+    var q1 = <Question>page.addNewQuestion("text", "q1");
+    var q2 = <Question>page.addNewQuestion("text", "q2");
+    survey.onTextMarkdown.add(function(survey, options) { 
+        if(options.text.indexOf("markdown")> -1) options.html = options.text.replace("markdown", "!") 
+    });
+    q2.value = "value2";
+    var loc = q1.locTitle;
+    q1.title = "title1, q2.value is {q2}markdown";
+    assert.equal(q1.fullTitle, "1. title1, q2.value is value2!", "question.title, use markdown and text preprocessing");
+    assert.equal(loc.renderedHtml, "1. title1, q2.value is value2!", "question.locTitle.renderedHtml, use markdown and text preprocessing");
+
+    survey.questionTitleTemplate = "{no}) {title} ({require})markdown";
+    q1.isRequired = true;
+    assert.equal(q1.fullTitle, "1) title1, q2.value is value2! (*)!", "question.title with chaqnged questionTitleTemplate, use markdown and text preprocessing");
+    assert.equal(loc.renderedHtml, "1) title1, q2.value is value2! (*)!", "question.locTitle.renderedHtml with chaqnged questionTitleTemplate, use markdown and text preprocessing");
+});
+
+QUnit.test("Survey Markdown - page title", function (assert) {
+    var survey = new SurveyModel();
+    var page = survey.addNewPage("Page 1");
+    var q1 = <Question>page.addNewQuestion("text", "q1");
+    survey.onTextMarkdown.add(function(survey, options) { 
+        if(options.text.indexOf("markdown")> -1) options.html = options.text.replace("markdown", "!") 
+    });
+    q1.value = "value1";
+    var loc = page.locTitle;
+    page.title = "Page 1markdown, q1 is {q1}";
+    assert.equal(page.processedTitle, "Page 1!, q1 is value1", "page.processedTitle, use markdown and text preprocessing");
+    assert.equal(loc.renderedHtml, "Page 1!, q1 is value1", "page.locTitle.renderedHtml, use markdown and text preprocessing");
+});
+
+QUnit.test("Survey Markdown - dropdownmatrix.columns", function (assert) {
+    var survey = new SurveyModel();
+    survey.onTextMarkdown.add(function(survey, options) { 
+        if(options.text.indexOf("markdown")> -1) options.html = options.text.replace("markdown", "!") 
+    });
+    var page = survey.addNewPage("Page 1");
+    var q1 = new QuestionMatrixDropdownModel("matrixdropdown");
+    var col1 = q1.addColumn("col1");
+    var col2 = q1.addColumn("col2", "colText2");
+    var col3 = q1.addColumn("col3", "colText3markdown");
+    q1.rows = ["row1", "row2"];
+    page.addQuestion(q1);
+    
+    var loc1 = col1.locTitle;
+    var loc2 = col2.locTitle;
+    var loc3 = col3.locTitle;
+    assert.equal(loc1.renderedHtml, "col1", "render column name");
+    assert.equal(loc2.renderedHtml, "colText2", "render column text");
+    assert.equal(loc3.renderedHtml, "colText3!", "render column text as markdown");
+});
+
+QUnit.test("Survey Markdown - nmatrix.rows", function (assert) {
+    var survey = new SurveyModel();
+    survey.onTextMarkdown.add(function(survey, options) { 
+        if(options.text.indexOf("markdown")> -1) options.html = options.text.replace("markdown", "!") 
+    });
+    var page = survey.addNewPage("Page 1");
+    var q1 = new QuestionMatrixModel("matrixdropdown");
+    q1.columns = [1];
+    q1.rows = ["row1", "row2", "row3"];
+    q1.rows[1].text = "rowText2";
+    q1.rows[2].text = "rowText3markdown";
+    page.addQuestion(q1);
+    
+    var loc1 = q1.visibleRows[0].locText;
+    var loc2 = q1.visibleRows[1].locText;
+    var loc3 = q1.visibleRows[2].locText;
+    assert.equal(loc1.renderedHtml, "row1", "render column name");
+    assert.equal(loc2.renderedHtml, "rowText2", "render column text");
+    assert.equal(loc3.renderedHtml, "rowText3!", "render column text as markdown");
+});
+
+
+QUnit.test("Survey Markdown - survey title", function (assert) {
+    var survey = new SurveyModel();
+    survey.onTextMarkdown.add(function(survey, options) { 
+        if(options.text.indexOf("markdown")> -1) options.html = options.text.replace("markdown", "!") 
+    });
+    survey.setValue("q1", "value1");
+    var loc = survey.locTitle;
+    survey.title = "Surveymarkdown, q1 is {q1}";
+    assert.equal(survey.processedTitle, "Survey!, q1 is value1", "survey.processedTitle, use markdown and text preprocessing");
+    assert.equal(loc.renderedHtml, "Survey!, q1 is value1", "survey.locTitle.renderedHtml, use markdown and text preprocessing");
 });
 
 function twoPageSimplestSurvey() {

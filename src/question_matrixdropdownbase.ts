@@ -18,6 +18,11 @@ export interface IMatrixDropdownData {
     columns: Array<MatrixDropdownColumn>;
     createQuestion(row: MatrixDropdownRowModelBase, column: MatrixDropdownColumn): Question;
     getLocale(): string;
+    getMarkdownHtml(text: string): string;
+}
+
+export interface IMatrixColumnOwner extends ILocalizableOwner {
+    getRequiredText(): string;    
 }
 
 export class MatrixDropdownColumn extends Base implements ILocalizableOwner {
@@ -33,20 +38,33 @@ export class MatrixDropdownColumn extends Base implements ILocalizableOwner {
     public inputType: string = "text";
     public choicesOrder: string = "none";
     public choicesByUrl: ChoicesRestfull;
-    public locOwner: ILocalizableOwner = null;
+    public colOwner: IMatrixColumnOwner = null;
     private colCountValue: number = -1;
     constructor(public name: string, title: string = null) {
         super();
         this.choicesValue = ItemValue.createArray(this);
-        this.locTitleValue = new LocalizableString(this);
+        this.locTitleValue = new LocalizableString(this, true);
+        var self = this;
+        this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.getFullTitle(text); };
         this.locOptionsCaptionValue = new LocalizableString(this);
         this.locPlaceHolderValue = new LocalizableString(this);
         this.choicesByUrl = new ChoicesRestfull();
+        if(title) this.title = title;
     }
     public getType() { return "matrixdropdowncolumn" }
     
-    public get title() { return this.locTitle.text ? this.locTitle.text : this.name; }
+    public get title(): string { return this.locTitle.text ? this.locTitle.text : this.name; }
     public set title(value: string) { this.locTitle.text = value; }
+    public get fullTitle(): string { return this.getFullTitle(this.locTitle.textOrHtml); }
+    public getFullTitle(str: string): string {
+        if(!str) str = this.name;
+        if (this.isRequired) {
+            var requireText = this.colOwner? this.colOwner.getRequiredText() : "";
+            if (requireText) requireText += " ";
+            str = requireText + str;
+        }
+        return str;
+    }
     public get locTitle() { return this.locTitleValue; }
     public get optionsCaption(): string { return this.locOptionsCaption.text;}
     public set optionsCaption(value: string){ this.locOptionsCaption.text = value;}
@@ -64,8 +82,12 @@ export class MatrixDropdownColumn extends Base implements ILocalizableOwner {
         if (value < -1 || value > 4) return;
         this.colCountValue = value;
     }
-    public getLocale() : string {
-        return this.locOwner ? this.locOwner.getLocale() : "";
+    public getLocale() : string { return this.colOwner ? this.colOwner.getLocale() : ""; }
+    public getMarkdownHtml(text: string)  { return this.colOwner ? this.colOwner.getMarkdownHtml(text) : null; }
+    public onLocaleChanged() {
+        this.locTitle.onChanged();
+        this.locOptionsCaption.onChanged();
+        ItemValue.NotifyArrayOnLocaleChanged(this.choices);
     }
 }
 
@@ -136,11 +158,17 @@ export class MatrixDropdownRowModelBase implements ISurveyData, ILocalizableOwne
     }
     public get isEmpty() {
         var val = this.value;
-        if (!val) return true;
+        if (Base.isValueEmpty(val)) return true;
         for (var key in val) return false;
         return true;
     }
     public getLocale(): string { return this.data ? this.data.getLocale() : "";}
+    public getMarkdownHtml(text: string)  { return this.data ? this.data.getMarkdownHtml(text) : null; }
+    public onLocaleChanged() {
+        for(var i = 0; i < this.cells.length; i ++) {
+            this.cells[i].question.onLocaleChanged();
+        }
+    }
     private buildCells() {
         var columns = this.data.columns;
         for (var i = 0; i < columns.length; i++) {
@@ -169,7 +197,7 @@ export class QuestionMatrixDropdownModelBase extends Question implements IMatrix
     public columnMinWidth: string = "";
     public horizontalScroll: boolean = false;
     public columnsChangedCallback: () => void;
-    public updateCellsCallbak: () => void;
+    public updateCellsCallback: () => void;
 
     constructor(public name: string) {
         super(name);
@@ -190,7 +218,7 @@ export class QuestionMatrixDropdownModelBase extends Question implements IMatrix
         var self = this;
         this.columnsValue.push = function (value) {
             var result = Array.prototype.push.call(this, value);
-            value.locOwner = self;
+            value.colOwner = self;
             if (self.data != null) {
                 self.fireCallback(self.columnsChangedCallback);
             }
@@ -200,7 +228,7 @@ export class QuestionMatrixDropdownModelBase extends Question implements IMatrix
             var result = Array.prototype.splice.call(this, start, deleteCount, ... items);
             if(!items) items = [];
             for(var i = 0; i < items.length; i ++) {
-                items[i].locOwner = self;
+                items[i].colOwner = self;
             }
             if (self.data != null) {
                 self.fireCallback(self.columnsChangedCallback);
@@ -212,22 +240,26 @@ export class QuestionMatrixDropdownModelBase extends Question implements IMatrix
     public set cellType(newValue: string) {
         if (this.cellType == newValue) return;
         this.cellTypeValue = newValue;
-        this.fireCallback(this.updateCellsCallbak);
+        this.fireCallback(this.updateCellsCallback);
     }
     public get columnColCount(): number { return this.columnColCountValue; }
     public set columnColCount(value: number) {
         if (value < 0 || value > 4) return;
         this.columnColCountValue = value;
-        this.fireCallback(this.updateCellsCallbak);
+        this.fireCallback(this.updateCellsCallback);
     }
-    public getColumnTitle(column: MatrixDropdownColumn): string {
-        var result = column.title;
-        if (column.isRequired && this.survey) {
-            var requireText = this.survey.requiredText;
-            if (requireText) requireText += " ";
-            result = requireText + result;
+    public getRequiredText(): string { return this.survey ? this.survey.requiredText : ""; }
+    public onLocaleChanged() {
+        super.onLocaleChanged();
+        this.locOptionsCaption.onChanged();
+        for(var i = 0; i < this.columns.length; i ++) {
+            this.columns[i].onLocaleChanged();
         }
-        return result;
+        var rows = this.visibleRows;
+        for(var i = 0; i < rows.length; i ++) {
+            rows[i].onLocaleChanged();
+        }
+        this.fireCallback(this.updateCellsCallback);
     }
     public getColumnWidth(column: MatrixDropdownColumn): string {
         return column.minWidth ? column.minWidth : this.columnMinWidth;
@@ -250,9 +282,6 @@ export class QuestionMatrixDropdownModelBase extends Question implements IMatrix
         return this.generatedVisibleRows;
     }
     protected generateRows(): Array<MatrixDropdownRowModelBase> { return null; }
-    protected createMatrixRow(name: any, text: string, value: any): MatrixDropdownRowModelBase {
-        return null;
-    }
     protected createNewValue(curValue: any): any { return !curValue ? {} : curValue; }
     protected getRowValue(row: MatrixDropdownRowModelBase, questionValue: any, create: boolean = false): any {
         var result = questionValue[row.rowName] ? questionValue[row.rowName] : null;
