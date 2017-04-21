@@ -90,5 +90,7 @@ JsonObject.metaData.addClass("page", [{ name: "navigationButtonsVisibility", def
                 }
                 if(!Array.isArray(value) && value != undefined) obj.nextPageValue = value;
 
+        }, onGetValue: function (obj) {
+            return Array.isArray(obj.nextPage) ? JSON.stringify(obj.nextPage) : obj.nextPage;
         }}],
     function () { return new PageModel(); }, "panel");
