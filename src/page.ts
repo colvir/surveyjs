@@ -77,7 +77,7 @@ export class PageModel extends PanelModelBase implements IPage {
 };
 
 JsonObject.metaData.addClass("page", [{ name: "navigationButtonsVisibility", default: "inherit", choices: ["iherit", "show", "hide"] },
-        { name: "nextPage:expression", onSetValue:
+        { name: "nextPage:setexpression", onSetValue:
             function (obj, value){
                 if(value.indexOf('"') == -1) obj.nextPage = value;
                 else {
