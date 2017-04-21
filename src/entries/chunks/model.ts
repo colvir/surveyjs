@@ -8,7 +8,7 @@ export {
     AnswerCountValidator, EmailValidator, NumericValidator, RegexValidator,
     SurveyValidator, TextValidator, ValidatorResult, ValidatorRunner
 } from "../../validator";
-export {Base, Event, SurveyError, ISurvey} from "../../base";
+export {Base, Event, SurveyError, ISurvey, IElement} from "../../base";
 export {ItemValue} from "../../itemvalue";
 export {ILocalizableOwner, LocalizableString} from "../../localizablestring";
 export {ChoicesRestfull} from "../../choicesRestfull";
