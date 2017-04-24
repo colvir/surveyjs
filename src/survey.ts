@@ -376,12 +376,14 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         this.doComplete();
         return true;
     }
-    public get isFirstPage(): boolean { 
+    public get isFirstPage(): boolean {
         if (this.currentPage == null) return true;
+        if(this.viewPageIdStack.length) return false;
         return this.visiblePages.indexOf(this.currentPage) == 0;
     }
     public get isLastPage(): boolean {
         if (this.currentPage == null) return true;
+        if(this.currentPage.getNextPage()) return false;
         var vPages = this.visiblePages;
         return vPages.indexOf(this.currentPage) == vPages.length - 1;
     }
