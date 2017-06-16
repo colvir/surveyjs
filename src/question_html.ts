@@ -16,6 +16,12 @@ export class QuestionHtmlModel extends QuestionBase {
     public set html(value: string) { this.locHtml.text = value; }
     public get locHtml(): LocalizableString { return this.locHtmlValue; }
     public get processedHtml() { return this.survey ? this.survey.processHtml(this.html) : this.html; }
+
+    clone(): QuestionHtmlModel{
+        let newQuestion = new QuestionHtmlModel(this.name), html = this.html;
+        if(html) newQuestion.html = JSON.parse(JSON.stringify(html));
+        return newQuestion;
+    }
 }
 JsonObject.metaData.addClass("html", [{name:"html:html", serializationProperty: "locHtml"}], function () { return new QuestionHtmlModel(""); }, "questionbase");
 QuestionFactory.Instance.registerQuestion("html", (name) => { return new QuestionHtmlModel(name); });

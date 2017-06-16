@@ -6,6 +6,13 @@ import {CustomError, ExceedSizeError} from "./error";
 import {surveyLocalization} from "./surveyStrings";
 
 export class QuestionFileModel extends Question {
+
+    clone(): QuestionFileModel{
+        let newQuestion = new QuestionFileModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
+
     private showPreviewValue: boolean = false;
     private isUploading: boolean = false;
     previewValueLoadedCallback: () => void;

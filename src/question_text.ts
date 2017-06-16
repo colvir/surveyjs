@@ -33,6 +33,12 @@ export class QuestionTextModel extends Question {
     private isNumber(value): boolean {
         return !isNaN(parseFloat(value)) && isFinite(value);
     }
+
+    clone(): QuestionTextModel{
+        let newQuestion = new QuestionTextModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
 }
 
 JsonObject.metaData.addClass("text", [{ name: "inputType", default: "text", choices: ["color", "date", "datetime", "datetime-local", "email", "month", "number", "password", "range", "tel", "text", "time", "url", "week"] },

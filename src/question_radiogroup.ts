@@ -10,6 +10,13 @@ export class QuestionRadiogroupModel extends QuestionCheckboxBase {
         return "radiogroup";
     }
     supportGoNextPageAutomatic() { return true; }
+
+    clone(): QuestionRadiogroupModel{
+        let newQuestion = new QuestionRadiogroupModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        newQuestion.choices = this.choices;
+        return newQuestion;
+    }
 }
 
 JsonObject.metaData.addClass("radiogroup", [], function () { return new QuestionRadiogroupModel(""); }, "checkboxbase");

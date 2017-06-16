@@ -1,4 +1,7 @@
-﻿export interface HashTable<T> {
+﻿import {QuestionBase} from "./questionbase";
+import {PageModel} from "./page";
+import {Question} from "./question";
+export interface HashTable<T> {
     [key: string]: T;
 }
 export interface ISurveyData {
@@ -32,7 +35,7 @@ export interface ISurvey extends ISurveyData {
 export interface IConditionRunner {
     runCondition(values: HashTable<any>);
 }
-export interface IElement  extends IConditionRunner{
+export interface IElement  extends IConditionRunner, Cloneable{
     name: string;
     visible: boolean;
     isVisible: boolean;
@@ -147,5 +150,30 @@ export class Event<T extends Function, Options>  {
         if (index != undefined) {
             this.callbacks.splice(index, 1);
         }
+    }
+}
+
+export interface Cloneable {
+    clone(): any;
+}
+
+export class CompletePage {
+    readonly pageId: String;
+    readonly questions: HashTable<any>;
+
+    constructor(page: PageModel){
+        this.pageId = page.id;
+        this.questions = page.questions.reduce((obj, q: Question) => {
+            obj[q.id] = q.value && JSON.parse(JSON.stringify(q.value));
+            obj[q.name] = obj[q.id];
+            return obj;
+        }, {});
+    }
+
+    toPage(page: PageModel): PageModel{
+        page.questions.forEach((q: Question) => {
+           if(this.questions[q.id]) q.value = JSON.parse(JSON.stringify(this.questions[q.id]));
+        });
+        return page;
     }
 }

@@ -1,11 +1,16 @@
 import {JsonObject} from "./jsonobject";
-import {Base, IPage, IConditionRunner, ISurvey, ISurveyData, IElement, IQuestion, HashTable, SurveyElement, SurveyPageId} from "./base";
+import {
+    Base, IPage, IConditionRunner, ISurvey, ISurveyData, IElement, IQuestion, HashTable, SurveyElement,
+    SurveyPageId, Cloneable
+} from "./base";
 import {QuestionBase} from "./questionbase";
 import {ConditionRunner} from "./conditions";
 import {QuestionFactory} from "./questionfactory";
 import {ILocalizableOwner, LocalizableString} from "./localizablestring";
 
-export class QuestionRowModel {
+
+
+export class QuestionRowModel implements Cloneable{
     private visibleValue: boolean;
     visibilityChangedCallback: () => void;
     constructor(public panel: PanelModelBase) {
@@ -51,12 +56,23 @@ export class QuestionRowModel {
         return res;
     }
     private calcVisible(): boolean { return this.getVisibleCount() > 0; }
+    public clone(): QuestionRowModel {
+        let newRow = new QuestionRowModel(this.panel.clone());
+        this.elements.forEach(it => newRow.addElement(it.clone()));
+        return newRow;
+    }
 }
 
-export class PanelModelBase extends Base implements IConditionRunner, ILocalizableOwner {
+export class PanelModelBase extends Base implements IConditionRunner, ILocalizableOwner, Cloneable {
     private static panelCounter = 100;
     private static getPanelId(): string {
         return "sp_" + PanelModelBase.panelCounter++;
+    }
+
+    public clone(): PanelModelBase{
+        let newPanel = new PanelModelBase(this.name);
+        this.elements.forEach(it => newPanel.addElement(it.clone()));
+        return newPanel;
     }
 
     private dataValue: ISurvey = null;

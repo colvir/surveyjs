@@ -3,6 +3,13 @@ import {QuestionFactory} from "./questionfactory";
 import {QuestionCheckboxBase} from "./question_baseselect";
 
 export class QuestionCheckboxModel extends QuestionCheckboxBase {
+
+    clone(): QuestionCheckboxModel{
+        let newQuestion = new QuestionCheckboxModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
+
     constructor(public name: string) {
         super(name);
     }

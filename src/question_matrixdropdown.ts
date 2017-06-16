@@ -19,6 +19,13 @@ export class MatrixDropdownRowModel extends MatrixDropdownRowModelBase {
     public get locText(): LocalizableString { return this.item.locText; }
 }
 export class QuestionMatrixDropdownModel extends QuestionMatrixDropdownModelBase implements IMatrixDropdownData {
+
+    clone(): QuestionMatrixDropdownModel{
+        let newQuestion = new QuestionMatrixDropdownModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
+
     private rowsValue: Array<ItemValue>;
 
     constructor(public name: string) {

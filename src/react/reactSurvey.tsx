@@ -67,7 +67,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
             <div ref="root" className={this.css.root}>
                 {title}
                 <div id={SurveyPageId} className={this.css.body}>
-                    {this.props.showPrevPages && this.survey.getViewPageIdStack().length > 0 && this.renderPreviewPages()}
+                    {this.props.showPrevPages && this.survey.getViewPageStack().length > 0 && this.renderPreviewPages()}
                     {topProgress}
                     {currentPage}
                     {bottomProgress}
@@ -95,10 +95,10 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
 
     protected renderPreviewPages(): JSX.Element {
         return (<div className="preview-pages">
-            {this.survey.getViewPageIdStack().map((pageId, index) => {
+            {this.survey.getViewPageStack().map((oldPage, index) => {
                 return <SurveyPreviewPage key={index} survey={this.survey} page={this.survey.pages.find((page) => {
-                    return page.id == pageId;
-                })} css={this.css} creator={this} />
+                    return page.id == oldPage.pageId;
+                })} css={this.css} creator={this} answers={oldPage.questions} />
             })}
         </div> );
     }

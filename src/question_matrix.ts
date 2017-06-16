@@ -37,6 +37,13 @@ export class MatrixRowModel extends Base {
     }
 }
 export class QuestionMatrixModel extends Question implements IMatrixData {
+
+    clone(): QuestionMatrixModel{
+        let newQuestion = new QuestionMatrixModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
+
     private columnsValue: Array<ItemValue>;
     private rowsValue: Array<ItemValue>;
     private isRowChanging = false;

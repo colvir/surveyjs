@@ -155,6 +155,12 @@ export class QuestionMatrixDynamicModel extends QuestionMatrixDropdownModelBase 
     protected getRowValue(row: MatrixDropdownRowModelBase, questionValue: any, create: boolean = false): any {
         return this.getRowValueByIndex(questionValue, this.generatedVisibleRows.indexOf(row));
     }
+
+    clone(): QuestionMatrixDynamicModel{
+        let newQuestion = new QuestionMatrixDynamicModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
 }
 
 JsonObject.metaData.addClass("matrixdynamic", [{ name: "rowCount:number", default: 2 }, { name: "minRowCount:number", default: 0 }, { name: "maxRowCount:number", default: QuestionMatrixDynamicModel.MaxRowCount },

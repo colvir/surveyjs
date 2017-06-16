@@ -8,6 +8,14 @@ import {ChoicesRestfull} from "./choicesRestfull";
 import {LocalizableString} from "./localizablestring";
 
 export class QuestionSelectBase extends Question {
+
+    clone(): QuestionSelectBase{
+        let newQuestion = new QuestionSelectBase(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        newQuestion.choices = this.choices;
+        return newQuestion;
+    }
+
     private visibleChoicesCache: Array<ItemValue> = null;
     private commentValue: string;
     private otherItemValue: ItemValue = new ItemValue("other", surveyLocalization.getString("otherItemText"));

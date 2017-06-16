@@ -109,6 +109,7 @@ export class QuestionBase extends Base implements IQuestion, IConditionRunner, I
     //ILocalizableOwner
     public getLocale(): string { return this.data ? (<ILocalizableOwner><any>this.data).getLocale() : ""; }
     public getMarkdownHtml(text: string)  { return this.data ? (<ILocalizableOwner><any>this.data).getMarkdownHtml(text) : null; }
+    public clone(){}
 }
 JsonObject.metaData.addClass("questionbase", ["!name", { name: "visible:boolean", default: true }, "visibleIf:expression",
     { name: "width" }, { name: "startWithNewLine:boolean", default: true}, {name: "indent:number", default: 0, choices: [0, 1, 2, 3]}]);

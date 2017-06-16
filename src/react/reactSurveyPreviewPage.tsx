@@ -7,8 +7,11 @@ import {SurveyPage, SurveyRow} from "./reactpage";
 import {ISurveyCreator} from "./reactquestion";
 import {QuestionBase} from "../questionbase";
 import {ReactQuestionFactory} from "./reactquestionfactory";
+import {HashTable} from "../base";
+import {Question} from "../question";
 
 export class SurveyPreviewPage extends SurveyPage implements ISurveyCreator{
+	protected answers: HashTable<any>;
 	render(): JSX.Element {
 		if (this.page == null || this.survey == null || this.creator == null) return null;
 		var title = this.renderTitle();
@@ -25,8 +28,13 @@ export class SurveyPreviewPage extends SurveyPage implements ISurveyCreator{
 		);
 	}
 	protected createRow(row: QuestionRowModel, index: number): JSX.Element {
-		var rowName = "row" + (index + 1);
-		return <SurveyRow key={rowName} row={row} survey={this.survey} creator={this} css={this.css} />;
+		let rowName = "row" + (index + 1),
+			newRow = row.clone();
+		newRow.questions.forEach((q: Question) => {
+
+			if(this.answers[q.name]) q.value = this.answers[q.name];
+		});
+		return <SurveyRow key={rowName} row={newRow} survey={this.survey} creator={this} css={this.css} />;
 	}
 	protected renderTitle(): JSX.Element {
 		if (!this.page.title || !this.survey.showPageTitles) return null;
@@ -48,4 +56,9 @@ export class SurveyPreviewPage extends SurveyPage implements ISurveyCreator{
 		return <div key={key} className={this.css.error.item}>{errorText}</div>;
 	}
 	public questionTitleLocation(): string { return this.survey.questionTitleLocation; }
+
+	constructor(props){
+		super(props);
+		this.answers = props.answers;
+	}
 }

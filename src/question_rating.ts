@@ -42,6 +42,12 @@ export class QuestionRatingModel extends Question {
     public get maxRateDescription(): string { return this.locMaxRateDescription.text;}
     public set maxRateDescription(value: string) { this.locMaxRateDescription.text = value;}
     public get locMaxRateDescription(): LocalizableString {return this.locMaxRateDescriptionValue;};
+
+    clone(): QuestionRatingModel{
+        let newQuestion = new QuestionRatingModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
 }
 ItemValue.setData(QuestionRatingModel.defaultRateValues, [1, 2, 3, 4, 5]);
 JsonObject.metaData.addClass("rating", ["hasComment:boolean", { name: "rateValues:itemvalues", onGetValue: function (obj: any) { return ItemValue.getData(obj.rateValues); }, onSetValue: function (obj: any, value: any) { obj.rateValues = value; }},

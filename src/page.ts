@@ -74,6 +74,11 @@ export class PageModel extends PanelModelBase implements IPage {
         return this.nextPageValue;
     }
 
+    public clone(): PageModel{
+        let newPanel = new PageModel(this.name);
+        this.elements.forEach(it => newPanel.addElement(it.clone()));
+        return newPanel;
+    }
 };
 
 JsonObject.metaData.addClass("page", [{ name: "navigationButtonsVisibility", default: "inherit", choices: ["iherit", "show", "hide"] },

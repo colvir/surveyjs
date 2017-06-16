@@ -20,6 +20,12 @@ export class QuestionCommentModel extends Question {
     isEmpty(): boolean {
         return super.isEmpty() || this.value === "";
     }
+
+    clone(): QuestionCommentModel{
+        let newQuestion = new QuestionCommentModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
 }
 JsonObject.metaData.addClass("comment", [{ name: "cols:number", default: 50 }, { name: "rows:number", default: 4 }, 
     {name: "placeHolder", serializationProperty: "locPlaceHolder"}], function () { return new QuestionCommentModel(""); }, "question");

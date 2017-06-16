@@ -211,6 +211,12 @@ export class QuestionMultipleTextModel extends Question implements IMultipleText
     getIsRequiredText(): string {
         return this.survey ? this.survey.requiredText : "";
     }
+
+    clone(): QuestionMultipleTextModel{
+        let newQuestion = new QuestionMultipleTextModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
 }
 
 JsonObject.metaData.addClass("multipletextitem", ["name", "isRequired:boolean", { name: "placeHolder", serializationProperty: "locPlaceHolder"}, 

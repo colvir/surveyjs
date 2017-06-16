@@ -5,6 +5,13 @@ import {surveyLocalization} from "./surveyStrings";
 import {LocalizableString} from "./localizablestring";
 
 export class QuestionDropdownModel extends QuestionSelectBase {
+
+    clone(): QuestionDropdownModel{
+        let newQuestion = new QuestionDropdownModel(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
+
     private locOptionsCaptionValue: LocalizableString;
     constructor(public name: string) {
         super(name);

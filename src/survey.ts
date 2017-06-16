@@ -1,5 +1,8 @@
 ﻿import {JsonObject} from "./jsonobject";
-import {Base, ISurvey, HashTable, IQuestion, IElement, IConditionRunner, IPage, SurveyError, Event} from "./base";
+import {
+    Base, ISurvey, HashTable, IQuestion, IElement, IConditionRunner, IPage, SurveyError, Event,
+    CompletePage
+} from "./base";
 import {ISurveyTriggerOwner, SurveyTrigger} from "./trigger";
 import {PageModel} from "./page";
 import {TextPreProcessor} from "./textPreProcessor";
@@ -81,12 +84,12 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public onAfterRenderQuestion: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public onAfterRenderPanel: Event<(sender: SurveyModel, options: any) => any, any> = new Event<(sender: SurveyModel, options: any) => any, any>();
     public jsonErrors: Array<JsonError> = null;
-    private viewPageIdStack: string[] = [];
+    private viewPageStack: CompletePage[] = [];
 
     public addInViewPageStack(pageId: string): boolean{
         let page = this.pages.find((page) => page.id == pageId);
         if(page) {
-            this.viewPageIdStack.push(pageId);
+            this.viewPageStack.push(new CompletePage(page));
             return true;
         } else return false;
     }
@@ -123,8 +126,8 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         }
         this.onCreating();
     }
-    public getViewPageIdStack(): string[]{
-        return this.viewPageIdStack;
+    public getViewPageStack(): CompletePage[]{
+        return this.viewPageStack;
     }
 
     public getType(): string { return "survey"; }
@@ -355,19 +358,9 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     public prevPage(): boolean {
         if (this.isFirstPage) return false;
-        var vPages = this.visiblePages, copyArr = this.viewPageIdStack.slice();
-        let pageId = copyArr.pop(), index: number;
-        while(pageId){
-            index = vPages.findIndex((page) => {
-                return page.id == pageId;
-            });
-            if(index != -1) break;
-
-            pageId = copyArr.pop();
-        }
-        if(index != -1){
-            this.currentPage = vPages[index];
-            this.viewPageIdStack = copyArr;
+        let prev = this.viewPageStack.pop(), page = this.pages.find(p => p.id == prev.pageId);
+        if(page){
+            this.currentPage = prev.toPage(page);
         }
     }
     public completeLastPage() : boolean {
@@ -378,7 +371,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     public get isFirstPage(): boolean {
         if (this.currentPage == null) return true;
-        if(this.viewPageIdStack.length) return false;
+        if(this.viewPageStack.length) return false;
         return this.visiblePages.indexOf(this.currentPage) == 0;
     }
     public get isLastPage(): boolean {
@@ -448,7 +441,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         if(nextPage) nextIndex = vPages.findIndex((page) => page.name == nextPage);
         if(nextIndex == -1) nextIndex = vPages.indexOf(this.currentPage) + 1;
 
-        this.viewPageIdStack.push(this.currentPage.id);
+        this.viewPageStack.push(new CompletePage(this.currentPage));
         this.currentPage = vPages[nextIndex];
     }
     protected setCompleted() {

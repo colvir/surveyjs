@@ -182,6 +182,12 @@ export class MatrixDropdownRowModelBase implements ISurveyData, ILocalizableOwne
 }
 
 export class QuestionMatrixDropdownModelBase extends Question implements IMatrixDropdownData {
+    clone(): QuestionMatrixDropdownModelBase{
+        let newQuestion = new QuestionMatrixDropdownModelBase(this.name);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        return newQuestion;
+    }
+
     public static  addDefaultColumns(matrix: QuestionMatrixDropdownModelBase) {
         var colNames = QuestionFactory.DefaultColums;
         for(var i = 0; i < colNames.length; i ++)
