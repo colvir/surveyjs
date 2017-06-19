@@ -97,7 +97,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
         return (<div className="preview-pages">
             {this.survey.getViewPageStack().map((oldPage, index) => {
                 return <SurveyPreviewPage key={index} survey={this.survey} page={this.survey.pages.find((page) => {
-                    return page.id == oldPage.pageId;
+                    return page.name == oldPage.pageName;
                 })} css={this.css} creator={this} answers={oldPage.questions} />
             })}
         </div> );

@@ -86,10 +86,10 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public jsonErrors: Array<JsonError> = null;
     private viewPageStack: CompletePage[] = [];
 
-    public addInViewPageStack(pageId: string): boolean{
-        let page = this.pages.find((page) => page.id == pageId);
+    public addInViewPageStack(pageName: string, data?: HashTable<any>): boolean{
+        let page = this.pages.find((page) => page.name == pageName);
         if(page) {
-            this.viewPageStack.push(new CompletePage(page));
+            this.viewPageStack.push(new CompletePage(page, data));
             return true;
         } else return false;
     }
@@ -358,7 +358,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     }
     public prevPage(): boolean {
         if (this.isFirstPage) return false;
-        let prev = this.viewPageStack.pop(), page = this.pages.find(p => p.id == prev.pageId);
+        let prev = this.viewPageStack.pop(), page = this.pages.find(p => p.name == prev.pageName);
         if(page){
             this.currentPage = prev.toPage(page);
         }

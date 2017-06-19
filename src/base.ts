@@ -158,13 +158,17 @@ export interface Cloneable {
 }
 
 export class CompletePage {
-    readonly pageId: String;
+    readonly pageName: String;
     readonly questions: HashTable<any>;
 
-    constructor(page: PageModel){
-        this.pageId = page.id;
+    constructor(page: PageModel, data?: HashTable<any>){
+        this.pageName = page.name;
         this.questions = page.questions.reduce((obj, q: Question) => {
-            obj[q.id] = q.value && JSON.parse(JSON.stringify(q.value));
+            if(data){
+                obj[q.id] = data[q.id] || data[q.name];
+            } else {
+                obj[q.id] = q.value && JSON.parse(JSON.stringify(q.value));
+            }
             obj[q.name] = obj[q.id];
             return obj;
         }, {});
