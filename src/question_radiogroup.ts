@@ -12,7 +12,7 @@ export class QuestionRadiogroupModel extends QuestionCheckboxBase {
     supportGoNextPageAutomatic() { return true; }
 
     clone(): QuestionRadiogroupModel{
-        let newQuestion = new QuestionRadiogroupModel(this.name);
+        let newQuestion = new QuestionRadiogroupModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         newQuestion.choices = this.choices;
         return newQuestion;

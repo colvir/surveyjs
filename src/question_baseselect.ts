@@ -226,6 +226,13 @@ export class QuestionCheckboxBase extends QuestionSelectBase {
         this.colCountValue = value;
         this.fireCallback(this.colCountChangedCallback);
     }
+
+    clone(): QuestionCheckboxBase{
+        let newQuestion = new QuestionCheckboxBase(this.name, this.title);
+        if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
+        newQuestion.choices = this.choices;
+        return newQuestion;
+    }
 }
 JsonObject.metaData.addClass("selectbase", ["hasComment:boolean", "hasOther:boolean",
     { name: "choices:itemvalues", onGetValue: function (obj: any) { return ItemValue.getData(obj.choices); }, onSetValue: function (obj: any, value: any) { obj.choices = value; }},
