@@ -10,7 +10,7 @@ import {LocalizableString} from "./localizablestring";
 export class QuestionSelectBase extends Question {
 
     clone(): QuestionSelectBase{
-        let newQuestion = new QuestionSelectBase(this.name);
+        let newQuestion = new QuestionSelectBase(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         newQuestion.choices = this.choices;
         return newQuestion;
@@ -29,8 +29,8 @@ export class QuestionSelectBase extends Question {
     public storeOthersAsComment: boolean = true;
     private choicesOrderValue: string = "none";
     choicesChangedCallback: () => void;
-    constructor(name: string) {
-        super(name);
+    constructor(name: string, title?: string) {
+        super(name, title);
         this.choicesValues = ItemValue.createArray(this);
         this.choicesByUrl = this.createRestfull();
         this.locOtherTextValue = new LocalizableString(this, true);
@@ -217,8 +217,8 @@ export class QuestionSelectBase extends Question {
 export class QuestionCheckboxBase extends QuestionSelectBase {
     private colCountValue: number = 1;
     colCountChangedCallback: () => void;
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
     }
     public get colCount(): number { return this.colCountValue; }
     public set colCount(value: number) {

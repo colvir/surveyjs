@@ -135,6 +135,9 @@ export class SurveyRow extends React.Component<any, any> {
             questions = [];
             for (var i = 0; i < this.row.elements.length; i++) {
                 let question = this.row.elements[i] as QuestionBase;
+                if(this.survey.showCompletedPage && this.creator.questionCount != null){
+                    question.setOnlyVisibleIndex(this.creator.questionCount++);
+                }
                 questions.push(this.createQuestion(question));
             }
         }

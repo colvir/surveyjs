@@ -8,7 +8,7 @@ import {surveyLocalization} from "./surveyStrings";
 export class QuestionFileModel extends Question {
 
     clone(): QuestionFileModel{
-        let newQuestion = new QuestionFileModel(this.name);
+        let newQuestion = new QuestionFileModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }
@@ -20,8 +20,8 @@ export class QuestionFileModel extends Question {
     public imageWidth: string;
     public storeDataAsText: boolean;
     public maxSize: number;
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
     }
     public getType(): string {
         return "file";

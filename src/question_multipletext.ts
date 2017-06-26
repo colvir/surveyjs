@@ -75,8 +75,8 @@ export class QuestionMultipleTextModel extends Question implements IMultipleText
     colCountChangedCallback: () => void;
     public itemSize: number = 25;
     private itemsValues: Array<MultipleTextItemModel> = new Array<MultipleTextItemModel>();
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.setItemsOverriddenMethods();
     }
     public getType(): string {
@@ -213,7 +213,7 @@ export class QuestionMultipleTextModel extends Question implements IMultipleText
     }
 
     clone(): QuestionMultipleTextModel{
-        let newQuestion = new QuestionMultipleTextModel(this.name);
+        let newQuestion = new QuestionMultipleTextModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }

@@ -24,12 +24,13 @@ export class Question extends QuestionBase implements IValidatorOwner {
     errorsChangedCallback: () => void;
     titleChangedCallback: () => void;
 
-    constructor(public name: string) {
+    constructor(public name: string, title?: string) {
         super(name);
         this.locTitleValue = new LocalizableString(this, true);
         var self = this;
         this.locTitleValue.onRenderedHtmlCallback = function(text) { return self.fullTitle; };
         this.locCommentTextValue = new LocalizableString(this, true);
+        if(title) this.title = title;
     }
     public get hasTitle(): boolean { return true; }
     public get hasInput(): boolean { return true; }

@@ -39,7 +39,7 @@ export class MatrixRowModel extends Base {
 export class QuestionMatrixModel extends Question implements IMatrixData {
 
     clone(): QuestionMatrixModel{
-        let newQuestion = new QuestionMatrixModel(this.name);
+        let newQuestion = new QuestionMatrixModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }
@@ -49,8 +49,8 @@ export class QuestionMatrixModel extends Question implements IMatrixData {
     private isRowChanging = false;
     private generatedVisibleRows: Array<MatrixRowModel>;
     public isAllRowRequired: boolean = false;
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.columnsValue = ItemValue.createArray(this);
         this.rowsValue = ItemValue.createArray(this);
     }

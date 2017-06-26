@@ -103,6 +103,10 @@ export class QuestionBase extends Base implements IQuestion, IConditionRunner, I
         this.visibleIndexValue = value;
         this.fireCallback(this.visibleIndexChangedCallback);
     }
+    public setOnlyVisibleIndex(value: number) {
+        if (this.visibleIndexValue == value) return;
+        this.visibleIndexValue = value;
+    }
     public supportGoNextPageAutomatic() { return false; }
     public clearUnusedValues() {}
     public onLocaleChanged() {}

@@ -7,8 +7,8 @@ export class QuestionCommentModel extends Question {
     public rows: number = 4;
     public cols: number = 50;
     private locPlaceHolderValue: LocalizableString;
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.locPlaceHolderValue = new LocalizableString(this);
     }
     public get placeHolder(): string { return this.locPlaceHolder.text; }
@@ -22,7 +22,7 @@ export class QuestionCommentModel extends Question {
     }
 
     clone(): QuestionCommentModel{
-        let newQuestion = new QuestionCommentModel(this.name);
+        let newQuestion = new QuestionCommentModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }

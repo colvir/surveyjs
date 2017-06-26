@@ -5,13 +5,13 @@ import {QuestionCheckboxBase} from "./question_baseselect";
 export class QuestionCheckboxModel extends QuestionCheckboxBase {
 
     clone(): QuestionCheckboxModel{
-        let newQuestion = new QuestionCheckboxModel(this.name);
+        let newQuestion = new QuestionCheckboxModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }
 
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
     }
     protected getHasOther(val: any): boolean {
         if (!val || !Array.isArray(val)) return false;

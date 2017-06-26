@@ -6,6 +6,7 @@ import {SurveyElementBase} from './reactquestionelement';
 import {SurveyCustomWidget} from './custom-widget';
 
 export interface ISurveyCreator {
+    questionCount?: number;
     createQuestionElement(question: QuestionBase): JSX.Element;
     renderError(key: string, errorText: string): JSX.Element;
     questionTitleLocation(): string;

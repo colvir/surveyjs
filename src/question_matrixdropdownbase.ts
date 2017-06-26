@@ -183,7 +183,7 @@ export class MatrixDropdownRowModelBase implements ISurveyData, ILocalizableOwne
 
 export class QuestionMatrixDropdownModelBase extends Question implements IMatrixDropdownData {
     clone(): QuestionMatrixDropdownModelBase{
-        let newQuestion = new QuestionMatrixDropdownModelBase(this.name);
+        let newQuestion = new QuestionMatrixDropdownModelBase(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }
@@ -205,8 +205,8 @@ export class QuestionMatrixDropdownModelBase extends Question implements IMatrix
     public columnsChangedCallback: () => void;
     public updateCellsCallback: () => void;
 
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.choicesValue = ItemValue.createArray(this);
         this.locOptionsCaptionValue = new LocalizableString(this);
         this.overrideColumnsMethods();

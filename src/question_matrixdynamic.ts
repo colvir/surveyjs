@@ -24,8 +24,8 @@ export class QuestionMatrixDynamicModel extends QuestionMatrixDropdownModelBase 
     private minRowCountValue = 0;
     private maxRowCountValue = QuestionMatrixDynamicModel.MaxRowCount;
     public rowCountChangedCallback: () => void;
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.locAddRowTextValue = new LocalizableString(this);
         this.locRemoveRowTextValue = new LocalizableString(this);
     }
@@ -157,7 +157,7 @@ export class QuestionMatrixDynamicModel extends QuestionMatrixDropdownModelBase 
     }
 
     clone(): QuestionMatrixDynamicModel{
-        let newQuestion = new QuestionMatrixDynamicModel(this.name);
+        let newQuestion = new QuestionMatrixDynamicModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }

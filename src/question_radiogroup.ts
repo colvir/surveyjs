@@ -3,8 +3,8 @@ import {QuestionFactory} from "./questionfactory";
 import {QuestionCheckboxBase} from "./question_baseselect";
 
 export class QuestionRadiogroupModel extends QuestionCheckboxBase {
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
     }
     public getType(): string {
         return "radiogroup";

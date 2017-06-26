@@ -31,7 +31,7 @@ export class SurveyPreviewPage extends SurveyPage implements ISurveyCreator{
 		let rowName = "row" + (index + 1),
 			newRow = row.clone();
 		newRow.questions.forEach((q: Question) => {
-
+			q.setOnlyVisibleIndex(this.creator.questionCount++);
 			if(this.answers[q.name]) q.value = this.answers[q.name];
 		});
 		return <SurveyRow key={rowName} row={newRow} survey={this.survey} creator={this} css={this.css} />;

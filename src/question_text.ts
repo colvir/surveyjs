@@ -7,8 +7,8 @@ export class QuestionTextModel extends Question {
     public size: number = 25;
     public inputType: string = "text";
     private locPlaceHolderValue: LocalizableString;
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.locPlaceHolderValue = new LocalizableString(this);
     }
     public getType(): string {
@@ -35,7 +35,7 @@ export class QuestionTextModel extends Question {
     }
 
     clone(): QuestionTextModel{
-        let newQuestion = new QuestionTextModel(this.name);
+        let newQuestion = new QuestionTextModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }

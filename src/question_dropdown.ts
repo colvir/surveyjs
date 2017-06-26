@@ -7,14 +7,14 @@ import {LocalizableString} from "./localizablestring";
 export class QuestionDropdownModel extends QuestionSelectBase {
 
     clone(): QuestionDropdownModel{
-        let newQuestion = new QuestionDropdownModel(this.name);
+        let newQuestion = new QuestionDropdownModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }
 
     private locOptionsCaptionValue: LocalizableString;
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.locOptionsCaptionValue = new LocalizableString(this);
     }
     public get optionsCaption() { return this.locOptionsCaption.text ? this.locOptionsCaption.text : surveyLocalization.getString("optionsCaption"); }

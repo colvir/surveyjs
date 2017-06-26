@@ -12,8 +12,8 @@ export class QuestionRatingModel extends Question {
 
     rateValuesChangedCallback: () => void;
 
-    constructor(public name: string) {
-        super(name);
+    constructor(public name: string, title?: string) {
+        super(name, title);
         this.rates = ItemValue.createArray(this);
         this.locMinRateDescriptionValue = new LocalizableString(this, true);
         this.locMaxRateDescriptionValue = new LocalizableString(this, true);
@@ -44,7 +44,7 @@ export class QuestionRatingModel extends Question {
     public get locMaxRateDescription(): LocalizableString {return this.locMaxRateDescriptionValue;};
 
     clone(): QuestionRatingModel{
-        let newQuestion = new QuestionRatingModel(this.name);
+        let newQuestion = new QuestionRatingModel(this.name, this.title);
         if(this.value) newQuestion.onSurveyValueChanged(JSON.parse(JSON.stringify(this.value)));
         return newQuestion;
     }

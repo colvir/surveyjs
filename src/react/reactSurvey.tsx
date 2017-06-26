@@ -12,13 +12,13 @@ import {SurveyPreviewPage} from "./reactSurveyPreviewPage";
 import {SurveyElementBase} from "./reactquestionelement";
 
 export class Survey extends React.Component<any, any> implements ISurveyCreator {
+    public questionCount: number;
     public static get cssType(): string { return surveyCss.currentType; }
     public static set cssType(value: string) { surveyCss.currentType = value; }
     protected survey: ReactSurveyModel;
     private isCurrentPageChanged: boolean = false;
     constructor(props: any) {
         super(props);
-
         this.updateSurvey(props);
     }
     componentWillReceiveProps(nextProps: any) {
@@ -63,6 +63,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
         if (!currentPage) {
             currentPage = this.renderEmptySurvey();
         }
+        if(this.survey.showCompletedPage) this.questionCount = 0;
         return (
             <div ref="root" className={this.css.root}>
                 {title}
