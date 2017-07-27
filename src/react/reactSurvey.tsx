@@ -50,6 +50,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
     protected renderCompleted(): JSX.Element {
         if(!this.survey.showCompletedPage) return null;
         var htmlValue = { __html: this.survey.processedCompletedHtml };
+        if(this.survey.showCompletedPage) this.questionCount = 0;
         return (<div>
             <div dangerouslySetInnerHTML={htmlValue} />
             {this.props.showPrevPages && this.survey.getViewPageStack().length > 0 && this.renderPreviewPages()}
