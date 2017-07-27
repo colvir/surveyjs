@@ -36,6 +36,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public pages: Array<PageModel> = new Array<PageModel>();
     public triggers: Array<SurveyTrigger> = new Array<SurveyTrigger>();
     public clearInvisibleValues: boolean = false;
+    public showBeforeCompleteText: string;
 
     private locTitleValue : LocalizableString;
     private locCompletedHtmlValue : LocalizableString;
