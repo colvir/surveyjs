@@ -17,9 +17,11 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
     public static set cssType(value: string) { surveyCss.currentType = value; }
     protected survey: ReactSurveyModel;
     private isCurrentPageChanged: boolean = false;
+    protected previewCss: any;
     constructor(props: any) {
         super(props);
         this.updateSurvey(props);
+        this.previewCss = Object.assign({}, this.css, {row: this.css.row + ' ' + this.css.previewRow});
     }
     componentWillReceiveProps(nextProps: any) {
         this.updateSurvey(nextProps);
@@ -48,7 +50,10 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
     protected renderCompleted(): JSX.Element {
         if(!this.survey.showCompletedPage) return null;
         var htmlValue = { __html: this.survey.processedCompletedHtml };
-        return (<div dangerouslySetInnerHTML={htmlValue} />);
+        return (<div>
+            <div dangerouslySetInnerHTML={htmlValue} />
+            {this.props.showPrevPages && this.survey.getViewPageStack().length > 0 && this.renderPreviewPages()}
+        </div>);
     }
     protected renderLoading(): JSX.Element {
         var htmlValue = { __html: this.survey.processedLoadingHtml };
@@ -63,6 +68,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
         if (!currentPage) {
             currentPage = this.renderEmptySurvey();
         }
+        var beforeComplete = this.survey.showBeforeCompleteText && this.survey.isLastPage ? <div className="before-complete">{this.survey.showBeforeCompleteText}</div> : null;
         if(this.survey.showCompletedPage) this.questionCount = 0;
         return (
             <div ref="root" className={this.css.root}>
@@ -72,6 +78,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
                     {topProgress}
                     {currentPage}
                     {bottomProgress}
+                    {beforeComplete}
                 </div>
                 {buttons}
             </div>
@@ -99,7 +106,7 @@ export class Survey extends React.Component<any, any> implements ISurveyCreator 
             {this.survey.getViewPageStack().map((oldPage, index) => {
                 return <SurveyPreviewPage key={index} survey={this.survey} page={this.survey.pages.find((page) => {
                     return page.name == oldPage.pageName;
-                })} css={this.css} creator={this} answers={oldPage.questions} />
+                })} css={this.previewCss} creator={this} answers={oldPage.questions} />
             })}
         </div> );
     }

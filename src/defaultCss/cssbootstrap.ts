@@ -28,6 +28,7 @@ export var defaultBootstrapCss = {
             root: "modal-header panel-title", title: "pull-left", button: "glyphicon pull-right",
             buttonExpanded: "glyphicon pull-right glyphicon-chevron-up", buttonCollapsed: "glyphicon pull-right glyphicon-chevron-down"
         }
-    }
+    },
+    previewRow: "preview-row"
 };
 surveyCss["bootstrap"] = defaultBootstrapCss;

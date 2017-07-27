@@ -34,7 +34,8 @@ export var defaultStandardCss = {
         header: {
             root: "sv_window_title", title: "", button: "", buttonExpanded: "", buttonCollapsed: ""
         }
-    }
+    },
+    previewRow: "sv_preview-row"
 };
 
 surveyCss["standard"] = defaultStandardCss;
