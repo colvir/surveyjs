@@ -21,6 +21,8 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
     public clientId: string = null;
     public cookieName: string = null;
     public sendResultOnPageNext: boolean = false;
+    public sendResultOnPageNextSync: any;
+    public onErrorHandler: any;
 
     public commentPrefix: string = "-Comment";
     public focusFirstQuestionAutomatic: boolean = true;
@@ -435,15 +437,24 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
         if (this.sendResultOnPageNext) {
             this.sendResult(this.surveyPostId, this.clientId, true);
         }
-        var vPages = this.visiblePages;
-        let nextIndex = -1,
-            nextPage = this.currentPage.getNextPage();
 
-        if(nextPage) nextIndex = vPages.findIndex((page) => page.name == nextPage);
-        if(nextIndex == -1) nextIndex = vPages.indexOf(this.currentPage) + 1;
+        new Promise((r: any, rj: any) => {
+            if(this.sendResultOnPageNextSync) this.sendResultOnPageNextSync().then(() => r()).catch((e: any) => rj(e));
+            else r();
+        }).then(() => {
+            var vPages = this.visiblePages;
+            let nextIndex = -1,
+                nextPage = this.currentPage.getNextPage();
 
-        this.viewPageStack.push(new CompletePage(this.currentPage));
-        this.currentPage = vPages[nextIndex];
+            if(nextPage) nextIndex = vPages.findIndex((page) => page.name == nextPage);
+            if(nextIndex == -1) nextIndex = vPages.indexOf(this.currentPage) + 1;
+
+            this.viewPageStack.push(new CompletePage(this.currentPage));
+            this.currentPage = vPages[nextIndex];
+        }).catch((e: any) => {
+            if(this.onErrorHandler) this.onErrorHandler(e);
+            else console.warn(e);
+        });
     }
     protected setCompleted() {
         this.isCompleted = true;
