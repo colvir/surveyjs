@@ -438,6 +438,7 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
             this.sendResult(this.surveyPostId, this.clientId, true);
         }
 
+        this.viewPageStack.push(new CompletePage(this.currentPage));
         new Promise((r: any, rj: any) => {
             if(this.sendResultOnPageNextSync) this.sendResultOnPageNextSync().then(() => r()).catch((e: any) => rj(e));
             else r();
@@ -448,10 +449,9 @@ export class SurveyModel extends Base implements ISurvey, ISurveyTriggerOwner, I
 
             if(nextPage) nextIndex = vPages.findIndex((page) => page.name == nextPage);
             if(nextIndex == -1) nextIndex = vPages.indexOf(this.currentPage) + 1;
-
-            this.viewPageStack.push(new CompletePage(this.currentPage));
             this.currentPage = vPages[nextIndex];
         }).catch((e: any) => {
+            this.viewPageStack.pop();
             if(this.onErrorHandler) this.onErrorHandler(e);
             else console.warn(e);
         });
