@@ -38,7 +38,7 @@ var platformOptions = {
             }
         },
         keywords: ['react', 'react-component'],
-        dependencies: { 'react': '^15.0.1', 'react-dom': '^15.0.1' }
+        dependencies: { 'react': '^15.6.1', 'react-dom': '^15.6.1' }
     },
     'knockout': {
         externals: {
@@ -62,12 +62,12 @@ var platformOptions = {
             }
         },
         keywords: ['jquery', 'jquery-plugin'],
-        dependencies: { 'jquery': '>=1.12.4', '@types/react': '15.0.21' }
+        dependencies: { 'jquery': '>=1.12.4', '@types/react': '15.6.1' }
     },
     'angular': {
         externals: {},
         keywords: ['angular', 'angular-component'],
-        dependencies: { '@types/react': '15.0.21' }
+        dependencies: { '@types/react': '15.6.1' }
     },
     'vue': {
         externals: {
